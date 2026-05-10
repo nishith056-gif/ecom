@@ -1,0 +1,45 @@
+{
+  "currencyRates": {
+    "AED": 1,
+    "USD": 0.2723,
+    "EUR": 0.253,
+    "GBP": 0.217,
+    "INR": 22.71
+  },
+  "fareRules": {
+    "metro": { "base": 3, "perKm": 0.42, "minimum": 3, "peakMultiplier": 1, "nightMultiplier": 1, "eco": 0.02 },
+    "bus": { "base": 3, "perKm": 0.31, "minimum": 3, "peakMultiplier": 1, "nightMultiplier": 1, "eco": 0.03 },
+    "tram": { "base": 3, "perKm": 0.35, "minimum": 3, "peakMultiplier": 1, "nightMultiplier": 1, "eco": 0.02 },
+    "taxi": { "base": 12, "perKm": 2.21, "minimum": 12, "peakMultiplier": 1.2, "nightMultiplier": 1.12, "waitingPerMin": 0.5, "eco": 0.18 },
+    "water": { "base": 15, "perKm": 3.5, "minimum": 15, "peakMultiplier": 1.08, "nightMultiplier": 1.15, "eco": 0.09 },
+    "scooter": { "base": 3, "unlock": 3, "perKm": 1.2, "minimum": 5, "peakMultiplier": 1.05, "nightMultiplier": 1.1, "eco": 0 },
+    "bike": { "base": 2, "unlock": 2, "perKm": 0.55, "minimum": 2, "peakMultiplier": 1, "nightMultiplier": 1, "eco": 0 },
+    "rideshare": { "base": 10, "perKm": 2.65, "minimum": 16, "peakMultiplier": 1.45, "nightMultiplier": 1.18, "dynamic": true, "eco": 0.16 }
+  },
+  "stations": [
+    { "id": "metro-001", "type": "metro", "name": "Burj Khalifa / Dubai Mall Metro", "lat": 25.1995, "lng": 55.2691, "area": "Downtown Dubai", "line": "Red Line", "status": "Open", "amenities": ["Mall link", "Elevator", "Nol recharge"] },
+    { "id": "metro-002", "type": "metro", "name": "Union Metro Station", "lat": 25.2672, "lng": 55.3162, "area": "Deira", "line": "Red + Green", "status": "Busy", "amenities": ["Interchange", "Taxi rank", "Retail"] },
+    { "id": "metro-003", "type": "metro", "name": "Mall of the Emirates Metro", "lat": 25.1181, "lng": 55.2006, "area": "Al Barsha", "line": "Red Line", "status": "Open", "amenities": ["Mall link", "Bus feeder", "Accessible"] },
+    { "id": "metro-004", "type": "metro", "name": "Dubai Marina Metro", "lat": 25.0802, "lng": 55.1406, "area": "Dubai Marina", "line": "Red Line", "status": "Open", "amenities": ["Tram transfer", "Bike dock", "Taxi rank"] },
+    { "id": "bus-001", "type": "bus", "name": "Dubai Mall Bus Stop", "lat": 25.1972, "lng": 55.2796, "area": "Downtown Dubai", "line": "F13 / 27 / 28", "status": "3 min", "amenities": ["Shelter", "Nol validator"] },
+    { "id": "bus-002", "type": "bus", "name": "Gold Souq Bus Station", "lat": 25.2716, "lng": 55.2981, "area": "Deira", "line": "C07 / 8 / 91A", "status": "7 min", "amenities": ["Terminal", "Restrooms", "Taxi"] },
+    { "id": "bus-003", "type": "bus", "name": "JBR Station 2 Bus Stop", "lat": 25.0754, "lng": 55.1304, "area": "JBR", "line": "8 / 84", "status": "5 min", "amenities": ["Beach access", "Shelter"] },
+    { "id": "tram-001", "type": "tram", "name": "Jumeirah Beach Residence 1 Tram", "lat": 25.0794, "lng": 55.1352, "area": "JBR", "line": "Dubai Tram", "status": "Open", "amenities": ["Metro link", "Beach access"] },
+    { "id": "tram-002", "type": "tram", "name": "Palm Jumeirah Tram", "lat": 25.1053, "lng": 55.1748, "area": "Palm Gateway", "line": "Dubai Tram", "status": "Open", "amenities": ["Monorail transfer", "Parking"] },
+    { "id": "taxi-001", "type": "taxi", "name": "DXB Terminal 3 Taxi Stand", "lat": 25.2482, "lng": 55.3657, "area": "Dubai Airport", "line": "Airport taxis", "status": "1 min", "amenities": ["24/7", "Card payment", "Family taxi"] },
+    { "id": "taxi-002", "type": "taxi", "name": "Dubai Mall Taxi Stand", "lat": 25.1977, "lng": 55.2784, "area": "Downtown Dubai", "line": "RTA taxi", "status": "4 min", "amenities": ["High capacity", "Accessible taxi"] },
+    { "id": "bike-001", "type": "bike", "name": "Careem Bike - Boulevard", "lat": 25.1948, "lng": 55.2719, "area": "Downtown Dubai", "line": "Bike dock", "status": "12 bikes", "amenities": ["Docked bikes", "E-bike nearby"] },
+    { "id": "bike-002", "type": "bike", "name": "Careem Bike - Marina Walk", "lat": 25.0827, "lng": 55.1469, "area": "Dubai Marina", "line": "Bike dock", "status": "8 bikes", "amenities": ["Waterfront", "Helmet kiosk"] },
+    { "id": "water-001", "type": "water", "name": "Dubai Marina Water Taxi", "lat": 25.0778, "lng": 55.1389, "area": "Dubai Marina", "line": "Water taxi", "status": "9 min", "amenities": ["Scenic route", "Ticket kiosk"] },
+    { "id": "water-002", "type": "water", "name": "Al Ghubaiba Marine Station", "lat": 25.2637, "lng": 55.2896, "area": "Bur Dubai", "line": "Abra / Ferry", "status": "Open", "amenities": ["Abra", "Ferry", "Bus link"] },
+    { "id": "scooter-001", "type": "scooter", "name": "E-scooter Hub - City Walk", "lat": 25.2077, "lng": 55.2625, "area": "City Walk", "line": "Scooter bay", "status": "14 scooters", "amenities": ["Battery 80%+", "Geo-fenced"] }
+  ],
+  "attractions": [
+    { "name": "Burj Khalifa", "lat": 25.1972, "lng": 55.2744, "tip": "Best reached by Burj Khalifa / Dubai Mall Metro plus the mall link bridge." },
+    { "name": "Museum of the Future", "lat": 25.2192, "lng": 55.2819, "tip": "Use Emirates Towers Metro, then walk a short covered route." },
+    { "name": "Dubai Creek", "lat": 25.2634, "lng": 55.2972, "tip": "Try an abra from Al Ghubaiba for the classic creek crossing." },
+    { "name": "Palm Jumeirah", "lat": 25.1124, "lng": 55.139, "tip": "Tram to Palm Jumeirah, then transfer to the monorail." },
+    { "name": "JBR Beach", "lat": 25.0799, "lng": 55.1338, "tip": "Dubai Tram stops are close to the beach promenade." },
+    { "name": "DXB Airport", "lat": 25.2532, "lng": 55.3657, "tip": "Red Line Metro serves Terminal 1 and Terminal 3." }
+  ]
+}

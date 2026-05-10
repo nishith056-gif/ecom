@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DubaiMove | Smart Transport for Dubai</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="loader" id="loader"><span></span><p>Syncing Dubai mobility grid</p></div>
+  <header class="topbar">
+    <a class="brand" href="#dashboard" aria-label="DubaiMove home"><span>DM</span><strong>DubaiMove</strong></a>
+    <nav class="nav" id="nav">
+      <a href="#dashboard">Dashboard</a><a href="#map">Map</a><a href="#planner">Planner</a><a href="#fare">Fares</a><a href="#nol">Nol</a><a href="#tourist">Tourist</a>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="voiceBtn" title="Voice search">🎙</button>
+      <button class="icon-btn danger" id="sosBtn" title="Emergency SOS">SOS</button>
+      <button class="icon-btn" id="themeToggle" title="Switch theme">☾</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="dashboard">
+      <div class="hero-media"></div>
+      <div class="hero-content">
+        <p class="eyebrow">Dubai smart-city mobility platform</p>
+        <h1>Move across Dubai with live GPS, fare intelligence, and simulated transit tracking.</h1>
+        <div class="hero-actions">
+          <button class="primary" id="locateBtn">Locate Me</button>
+          <button class="secondary" data-open="assistantModal">Ask AI Assistant</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="glass status-card">
+        <span class="pulse"></span>
+        <h2>Live Location</h2>
+        <p id="permissionText">Location permission is required for nearest transport discovery.</p>
+        <div class="coords"><span id="latText">Lat: --</span><span id="lngText">Lng: --</span></div>
+      </article>
+      <article class="glass metric"><small>Nearest Option</small><strong id="nearestText">--</strong><span id="nearestEta">Waiting for GPS</span></article>
+      <article class="glass metric"><small>Monthly Spend</small><strong id="spendCounter">AED 0</strong><span>From local trip history</span></article>
+      <article class="glass metric"><small>Carbon Saved</small><strong id="carbonCounter">0 kg</strong><span>Compared with private car</span></article>
+      <article class="glass metric"><small>Rewards</small><strong id="rewardCounter">0 pts</strong><span>Earned from eco trips</span></article>
+    </section>
+
+    <section class="section" id="map">
+      <div class="section-head">
+        <div><p class="eyebrow">Interactive simulated map</p><h2>Nearby transport grid</h2></div>
+        <div class="filters" id="filters"></div>
+      </div>
+      <div class="map-shell glass">
+        <div class="map-toolbar">
+          <button id="zoomIn">+</button><button id="zoomOut">-</button><button id="resetMap">Reset</button>
+        </div>
+        <div class="dubai-map" id="dubaiMap">
+          <div class="route-line line-a"></div><div class="route-line line-b"></div>
+          <div class="moving metro-move">🚇</div><div class="moving bus-move">🚌</div>
+          <div class="traffic t1">Moderate traffic</div><div class="traffic t2">Clear corridor</div>
+        </div>
+      </div>
+      <div class="category-nearest" id="categoryNearest"></div>
+      <div class="nearby-list" id="nearbyList"></div>
+    </section>
+
+    <section class="section split" id="planner">
+      <div class="glass panel">
+        <p class="eyebrow">Journey planner</p>
+        <h2>Plan a route</h2>
+        <label>Source <input id="sourceInput" placeholder="Use current location or type an area"></label>
+        <label>Destination <input id="destinationInput" placeholder="Dubai Mall, DXB, Marina..."></label>
+        <div class="mode-picker" id="modePicker"></div>
+        <button class="primary full" id="planBtn">Generate Smart Routes</button>
+      </div>
+      <div class="routes" id="routes"></div>
+    </section>
+
+    <section class="section split" id="fare">
+      <div class="glass panel">
+        <p class="eyebrow">Fare intelligence</p>
+        <h2>Compare fares</h2>
+        <label>Trip distance (km) <input id="fareDistance" type="number" value="12" min="1" step="0.5"></label>
+        <label>Currency <select id="currencySelect"><option>AED</option><option>USD</option><option>EUR</option><option>GBP</option><option>INR</option></select></label>
+        <button class="primary full" id="fareBtn">Calculate Fares</button>
+      </div>
+      <div class="fare-grid" id="fareGrid"></div>
+    </section>
+
+    <section class="section split" id="nol">
+      <div class="glass panel">
+        <p class="eyebrow">Simulated Nol wallet</p>
+        <h2>Nol Card</h2>
+        <div class="nol-card"><span>Balance</span><strong id="nolBalance">AED 0</strong><small>DubaiMove Silver</small></div>
+        <label>Recharge amount <input id="rechargeAmount" type="number" value="25" min="5"></label>
+        <button class="primary full" id="rechargeBtn">Recharge</button>
+        <button class="secondary full" id="qrBtn">Generate QR Ticket</button>
+      </div>
+      <div class="glass panel">
+        <p class="eyebrow">Taxi simulation</p>
+        <h2>Book a taxi</h2>
+        <label>Pickup <input id="pickupInput" placeholder="Current GPS"></label>
+        <label>Drop-off <input id="dropInput" placeholder="Dubai Marina"></label>
+        <button class="primary full" id="bookTaxiBtn">Assign Driver</button>
+        <div class="ride-status" id="rideStatus">No active ride</div>
+      </div>
+    </section>
+
+    <section class="section" id="tourist">
+      <div class="section-head"><div><p class="eyebrow">Tourist tools</p><h2>Attractions and airport help</h2></div></div>
+      <div class="tourist-grid" id="touristGrid"></div>
+    </section>
+  </main>
+
+  <button class="fab" id="fabLocate" title="Locate me">⌖</button>
+
+  <dialog class="modal" id="detailModal"><div id="modalBody"></div><button class="secondary" data-close>Close</button></dialog>
+  <dialog class="modal assistant-modal" id="assistantModal">
+    <h2>DubaiMove AI</h2>
+    <div class="chat-log" id="chatLog"></div>
+    <form id="chatForm"><input id="chatInput" placeholder="Ask for cheapest route, airport help, nearby metro..."><button>Send</button></form>
+    <button class="secondary" data-close>Close</button>
+  </dialog>
+  <script src="script.js"></script>
+</body>
+</html>

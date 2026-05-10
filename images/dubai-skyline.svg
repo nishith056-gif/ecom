@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" role="img" aria-label="Abstract Dubai skyline">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset=".55" stop-color="#123449"/>
+      <stop offset="1" stop-color="#00d4ff"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" x2="1">
+      <stop offset="0" stop-color="#00f5d4"/>
+      <stop offset="1" stop-color="#ffd166"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="420" fill="url(#sky)"/>
+  <circle cx="1010" cy="84" r="54" fill="#ffd166" opacity=".88"/>
+  <path d="M0 280 C160 230 260 305 420 250 C580 195 675 288 820 238 C985 181 1060 255 1200 215 L1200 420 L0 420 Z" fill="#0b1d2d" opacity=".8"/>
+  <path d="M83 254h46v166H83zM156 206h72v214h-72zM262 170h48v250h-48zM360 236h78v184h-78zM520 116h38v304h-38zM535 34l18 82h-36zM612 188h88v232h-88zM752 130h62v290h-62zM860 218h86v202h-86zM995 160h54v260h-54zM1083 236h72v184h-72z" fill="#07111f"/>
+  <path d="M0 340 C240 315 350 375 580 330 C780 292 925 360 1200 318" fill="none" stroke="url(#glow)" stroke-width="5" opacity=".9"/>
+  <g fill="#9bf6ff" opacity=".75">
+    <rect x="174" y="230" width="12" height="42"/><rect x="196" y="230" width="12" height="42"/>
+    <rect x="629" y="214" width="12" height="54"/><rect x="656" y="214" width="12" height="54"/>
+    <rect x="772" y="156" width="12" height="62"/><rect x="793" y="156" width="12" height="62"/>
+    <rect x="1013" y="190" width="12" height="58"/><rect x="1032" y="190" width="12" height="58"/>
+  </g>
+</svg>
