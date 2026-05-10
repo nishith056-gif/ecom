@@ -234,9 +234,27 @@ h2 { font-size: clamp(1.45rem, 3vw, 2.3rem); margin-bottom: .75rem; }
   transform-origin: center;
   transition: transform .25s ease;
 }
-.route-line { position: absolute; height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--cyan), var(--amber)); box-shadow: 0 0 20px var(--cyan); }
-.line-a { width: 70%; top: 44%; left: 12%; transform: rotate(-12deg); }
-.line-b { width: 58%; top: 61%; left: 20%; transform: rotate(22deg); background: linear-gradient(90deg, var(--rose), var(--mint)); }
+.overlay-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.network-line {
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .84;
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, .55));
+}
+.network-line.metro { stroke: var(--cyan); }
+.network-line.tram { stroke: var(--rose); }
+.network-line.bus { stroke: var(--amber); }
+.network-line.water { stroke: #7dd3fc; }
+.network-line.bike { stroke: var(--mint); }
 .marker {
   position: absolute;
   display: grid;
@@ -251,7 +269,7 @@ h2 { font-size: clamp(1.45rem, 3vw, 2.3rem); margin-bottom: .75rem; }
   animation: pop .35s ease both;
 }
 .marker.user { width: 46px; height: 46px; background: var(--cyan); color: #061522; animation: pulse 1.8s infinite; }
-.moving {
+.vehicle {
   position: absolute;
   z-index: 2;
   padding: .42rem .62rem;
@@ -261,19 +279,19 @@ h2 { font-size: clamp(1.45rem, 3vw, 2.3rem); margin-bottom: .75rem; }
   font-size: .82rem;
   font-weight: 900;
   filter: drop-shadow(0 8px 12px rgba(0,0,0,.35));
+  transition: left 1s linear, top 1s linear;
 }
-.metro-move { top: 42%; left: 12%; animation: moveA 9s linear infinite; }
-.bus-move { top: 62%; left: 18%; animation: moveB 12s linear infinite; }
 .traffic {
   position: absolute;
+  z-index: 2;
   padding: .45rem .7rem;
   border-radius: 8px;
   font-size: .8rem;
   background: rgba(255, 209, 102, .9);
   color: #061522;
 }
-.t1 { left: 66%; top: 30%; }
-.t2 { left: 12%; top: 73%; background: rgba(0,245,212,.9); }
+.traffic.clear { background: rgba(0,245,212,.9); }
+.traffic.busy { background: rgba(255, 92, 138, .9); color: #fff; }
 .nearby-list, .routes, .fare-grid, .tourist-grid, .category-nearest {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -345,8 +363,6 @@ h2 { font-size: clamp(1.45rem, 3vw, 2.3rem); margin-bottom: .75rem; }
 @keyframes pulse { 70% { box-shadow: 0 0 0 18px rgba(0, 245, 212, 0); } }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pop { from { opacity: 0; transform: translate(-50%, -50%) scale(.6); } }
-@keyframes moveA { from { transform: translateX(0); } to { transform: translateX(65vw); } }
-@keyframes moveB { from { transform: translateX(0) translateY(0); } to { transform: translateX(52vw) translateY(-16vh); } }
 
 @media (max-width: 980px) {
   .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

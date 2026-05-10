@@ -17,7 +17,9 @@
     "rideshare": { "base": 10, "perKm": 2.65, "minimum": 16, "peakMultiplier": 1.45, "nightMultiplier": 1.18, "dynamic": true, "eco": 0.16 }
   },
   "stations": [
+    { "id": "metro-000", "type": "metro", "name": "Airport Terminal 3 Metro", "lat": 25.2457, "lng": 55.3592, "area": "Dubai Airport", "line": "Red Line", "status": "Open", "amenities": ["Airport link", "Luggage access", "Nol recharge"] },
     { "id": "metro-001", "type": "metro", "name": "Burj Khalifa / Dubai Mall Metro", "lat": 25.1995, "lng": 55.2691, "area": "Downtown Dubai", "line": "Red Line", "status": "Open", "amenities": ["Mall link", "Elevator", "Nol recharge"] },
+    { "id": "metro-005", "type": "metro", "name": "Emirates Towers Metro", "lat": 25.2179, "lng": 55.2835, "area": "Trade Centre", "line": "Red Line", "status": "Open", "amenities": ["Museum access", "Business district", "Accessible"] },
     { "id": "metro-002", "type": "metro", "name": "Union Metro Station", "lat": 25.2672, "lng": 55.3162, "area": "Deira", "line": "Red + Green", "status": "Busy", "amenities": ["Interchange", "Taxi rank", "Retail"] },
     { "id": "metro-003", "type": "metro", "name": "Mall of the Emirates Metro", "lat": 25.1181, "lng": 55.2006, "area": "Al Barsha", "line": "Red Line", "status": "Open", "amenities": ["Mall link", "Bus feeder", "Accessible"] },
     { "id": "metro-004", "type": "metro", "name": "Dubai Marina Metro", "lat": 25.0802, "lng": 55.1406, "area": "Dubai Marina", "line": "Red Line", "status": "Open", "amenities": ["Tram transfer", "Bike dock", "Taxi rank"] },
@@ -33,6 +35,13 @@
     { "id": "water-001", "type": "water", "name": "Dubai Marina Water Taxi", "lat": 25.0778, "lng": 55.1389, "area": "Dubai Marina", "line": "Water taxi", "status": "9 min", "amenities": ["Scenic route", "Ticket kiosk"] },
     { "id": "water-002", "type": "water", "name": "Al Ghubaiba Marine Station", "lat": 25.2637, "lng": 55.2896, "area": "Bur Dubai", "line": "Abra / Ferry", "status": "Open", "amenities": ["Abra", "Ferry", "Bus link"] },
     { "id": "scooter-001", "type": "scooter", "name": "E-scooter Hub - City Walk", "lat": 25.2077, "lng": 55.2625, "area": "City Walk", "line": "Scooter bay", "status": "14 scooters", "amenities": ["Battery 80%+", "Geo-fenced"] }
+  ],
+  "networkLines": [
+    { "id": "red-line", "type": "metro", "name": "Dubai Metro Red Line corridor", "stationIds": ["metro-004", "metro-003", "metro-001", "metro-005", "metro-002", "metro-000"], "frequencyMin": 4 },
+    { "id": "tram-loop", "type": "tram", "name": "Dubai Tram Marina / Palm corridor", "stationIds": ["tram-001", "metro-004", "tram-002"], "frequencyMin": 6 },
+    { "id": "bus-core", "type": "bus", "name": "Core bus corridor", "stationIds": ["bus-003", "bus-001", "bus-002"], "frequencyMin": 8 },
+    { "id": "marine-link", "type": "water", "name": "Marine transport corridor", "stationIds": ["water-001", "water-002"], "frequencyMin": 15 },
+    { "id": "cycle-link", "type": "bike", "name": "Bike and micro-mobility corridor", "stationIds": ["bike-002", "bike-001", "scooter-001"], "frequencyMin": 2 }
   ],
   "attractions": [
     { "name": "Burj Khalifa", "lat": 25.1972, "lng": 55.2744, "tip": "Best reached by Burj Khalifa / Dubai Mall Metro plus the mall link bridge." },

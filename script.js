@@ -6,6 +6,7 @@ const state = {
   selectedModes: new Set(["metro", "bus", "taxi", "rideshare", "bike"]),
   zoom: 1,
   currency: "AED",
+  overlayBounds: null,
   timers: []
 };
 
@@ -158,23 +159,106 @@ function renderNearestByType() {
 
 function renderMap() {
   const map = $("#dubaiMap");
-  map.querySelectorAll(".marker").forEach((marker) => marker.remove());
+  map.querySelectorAll(".marker, .vehicle, .traffic, .overlay-lines").forEach((element) => element.remove());
+  state.overlayBounds = getOverlayBounds();
+  renderNetworkLines();
+  renderTrafficLabels();
   if (state.user) addMarker({ ...state.user, type: "user", name: "You" });
   stationsWithDistance().filter((station) => state.activeFilters.has(station.type)).forEach(addMarker);
+  renderVehicles();
 }
 
 function addMarker(item) {
-  const bounds = { minLat: 25.05, maxLat: 25.31, minLng: 55.11, maxLng: 55.39 };
-  const x = ((item.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 86 + 7;
-  const y = (1 - ((item.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat))) * 78 + 9;
+  const point = projectPoint(item);
   const marker = document.createElement("button");
   marker.className = `marker ${item.type === "user" ? "user" : ""}`;
-  marker.style.left = `${Math.max(4, Math.min(96, x))}%`;
-  marker.style.top = `${Math.max(4, Math.min(96, y))}%`;
+  marker.style.left = `${point.x}%`;
+  marker.style.top = `${point.y}%`;
   marker.textContent = item.type === "user" ? "GPS" : icons[item.type];
   marker.title = item.name;
   marker.addEventListener("click", () => item.type === "user" ? openModal(`<h2>Your Location</h2><p>${formatCoords()}</p>`) : showStation(item.id));
   $("#dubaiMap").appendChild(marker);
+}
+
+function getOverlayBounds() {
+  const points = [...state.data.stations, ...(state.user ? [state.user] : [])];
+  const lats = points.map((point) => point.lat);
+  const lngs = points.map((point) => point.lng);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+  const minLng = Math.min(...lngs);
+  const maxLng = Math.max(...lngs);
+  const latPad = Math.max((maxLat - minLat) * 0.14, 0.012);
+  const lngPad = Math.max((maxLng - minLng) * 0.14, 0.012);
+  return { minLat: minLat - latPad, maxLat: maxLat + latPad, minLng: minLng - lngPad, maxLng: maxLng + lngPad };
+}
+
+function projectPoint(point) {
+  const bounds = state.overlayBounds || getOverlayBounds();
+  const x = ((point.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 100;
+  const y = (1 - ((point.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat))) * 100;
+  return { x: clamp(x, 3, 97), y: clamp(y, 3, 97) };
+}
+
+function renderNetworkLines() {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "overlay-lines");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  state.data.networkLines
+    .filter((line) => state.activeFilters.has(line.type))
+    .forEach((line) => {
+      const points = line.stationIds.map(findStationById).filter(Boolean).map(projectPoint);
+      if (points.length < 2) return;
+      const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      polyline.setAttribute("class", `network-line ${line.type}`);
+      polyline.setAttribute("points", points.map((point) => `${point.x},${point.y}`).join(" "));
+      polyline.setAttribute("aria-label", line.name);
+      svg.appendChild(polyline);
+    });
+  $("#dubaiMap").appendChild(svg);
+}
+
+function renderVehicles() {
+  state.data.networkLines
+    .filter((line) => state.activeFilters.has(line.type))
+    .forEach((line) => {
+      const points = line.stationIds.map(findStationById).filter(Boolean).map(projectPoint);
+      if (points.length < 2) return;
+      const vehicle = document.createElement("div");
+      vehicle.className = `vehicle vehicle-${line.type}`;
+      vehicle.textContent = `${icons[line.type]} ${title(line.type)}`;
+      vehicle.dataset.points = JSON.stringify(points);
+      vehicle.dataset.speed = String(line.frequencyMin || 6);
+      $("#dubaiMap").appendChild(vehicle);
+    });
+  updateOverlayVehicles();
+}
+
+function updateOverlayVehicles() {
+  $$(".vehicle").forEach((vehicle, index) => {
+    const points = JSON.parse(vehicle.dataset.points || "[]");
+    if (points.length < 2) return;
+    const duration = Number(vehicle.dataset.speed) * 1500;
+    const progress = ((Date.now() + index * 1800) % duration) / duration;
+    const position = interpolatePath(points, progress);
+    vehicle.style.left = `${position.x}%`;
+    vehicle.style.top = `${position.y}%`;
+  });
+}
+
+function renderTrafficLabels() {
+  state.data.networkLines.slice(0, 4).forEach((line, index) => {
+    const points = line.stationIds.map(findStationById).filter(Boolean).map(projectPoint);
+    if (points.length < 2) return;
+    const mid = points[Math.floor(points.length / 2)];
+    const traffic = trafficForLine(line, index);
+    const label = document.createElement("div");
+    label.className = `traffic ${traffic.level}`;
+    label.style.left = `${clamp(mid.x + 2, 5, 84)}%`;
+    label.style.top = `${clamp(mid.y + 2, 5, 90)}%`;
+    label.textContent = `${line.name}: ${traffic.text}`;
+    $("#dubaiMap").appendChild(label);
+  });
 }
 
 function renderFilters() {
@@ -373,8 +457,10 @@ function startRealtimeLoops() {
   state.timers.push(setInterval(() => {
     if (!state.user) return;
     renderNearby();
-    $$(".traffic").forEach((item) => item.textContent = Math.random() > .5 ? "Moderate traffic" : "Clear corridor");
+    updateOverlayVehicles();
+    renderMap();
   }, 6000));
+  state.timers.push(setInterval(updateOverlayVehicles, 1000));
 }
 
 function openModal(html) {
@@ -411,6 +497,32 @@ function findDestination(query) {
   return state.data.attractions.find((item) => item.name.toLowerCase().includes(query.toLowerCase()));
 }
 
+function findStationById(id) {
+  return state.data.stations.find((station) => station.id === id);
+}
+
+function interpolatePath(points, progress) {
+  const segmentCount = points.length - 1;
+  const scaled = progress * segmentCount;
+  const index = Math.min(Math.floor(scaled), segmentCount - 1);
+  const local = scaled - index;
+  const start = points[index];
+  const end = points[index + 1];
+  return {
+    x: start.x + (end.x - start.x) * local,
+    y: start.y + (end.y - start.y) * local
+  };
+}
+
+function trafficForLine(line, index) {
+  const hour = new Date().getHours();
+  const peak = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 20);
+  if (line.type === "metro" || line.type === "tram") return { level: peak ? "busy" : "clear", text: peak ? "high passenger load" : "regular service" };
+  if (line.type === "bus") return { level: peak ? "busy" : "", text: peak ? "road delays likely" : "moderate road flow" };
+  if (line.type === "water") return { level: "clear", text: "marine route open" };
+  return { level: index % 2 ? "clear" : "", text: "availability based on nearby docks" };
+}
+
 function setActiveNav() {
   const id = location.hash || "#dashboard";
   $$(".nav a").forEach((link) => link.classList.toggle("active", link.getAttribute("href") === id));
@@ -424,6 +536,7 @@ function googleDirectionsUrl(destination) {
   const origin = state.user ? `${state.user.lat},${state.user.lng}` : `${fallbackLocation.lat},${fallbackLocation.lng}`;
   return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(`${destination.lat},${destination.lng}`)}&travelmode=transit`;
 }
+function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
 function getNumber(key) { return Number(localStorage.getItem(key) || 0); }
 function title(value) { return value.replace(/^\w/, (letter) => letter.toUpperCase()); }
 function formatCoords() { return state.user ? `${state.user.lat.toFixed(5)}, ${state.user.lng.toFixed(5)}` : "--"; }
