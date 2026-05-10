@@ -105,10 +105,11 @@ function updateGoogleMap() {
   const coords = `${state.user.lat.toFixed(7)},${state.user.lng.toFixed(7)}`;
   const mapsUrl = `https://www.google.com/maps?q=${coords}`;
   const nearest = stationsWithDistance()[0];
-  $("#googleMapFrame").src = `https://maps.google.com/maps?q=${coords}&z=16&output=embed`;
+  $("#googleMapFrame").src = `https://maps.google.com/maps?q=${coords}&z=12&output=embed`;
   $("#openGoogleMaps").href = mapsUrl;
   $("#googleSearchNearby").href = `https://www.google.com/maps/search/transport+near+me/@${coords},15z`;
   $("#googleDirections").href = nearest ? googleDirectionsUrl(nearest) : mapsUrl;
+  renderGoogleTransportMarkers();
 }
 
 function haversine(a, b) {
@@ -168,6 +169,24 @@ function renderMap() {
   renderVehicles();
 }
 
+function renderGoogleTransportMarkers() {
+  const layer = $("#googleTransportLayer");
+  if (!layer || !state.user || !state.data) return;
+  const markerTypes = ["metro", "bus", "taxi"];
+  const stations = markerTypes
+    .map((type) => stationsWithDistance().find((station) => station.type === type))
+    .filter(Boolean);
+  const bounds = getGoogleMarkerBounds(stations);
+  const userPoint = projectGoogleMarker(state.user, bounds);
+  layer.innerHTML = `
+    <a class="google-poi user" style="left:${userPoint.x}%;top:${userPoint.y}%" href="${$("#openGoogleMaps").href}" target="_blank" rel="noopener" title="Your live GPS location">GPS<span>Your location</span></a>
+    ${stations.map((station) => {
+      const point = projectGoogleMarker(station, bounds);
+      return `<a class="google-poi ${station.type}" style="left:${point.x}%;top:${point.y}%" href="${googleDirectionsUrl(station)}" target="_blank" rel="noopener" title="${station.name}">${icons[station.type]}<span>${station.name} · ${station.distance.toFixed(2)} km</span></a>`;
+    }).join("")}
+  `;
+}
+
 function addMarker(item) {
   const point = projectPoint(item);
   const marker = document.createElement("button");
@@ -193,11 +212,30 @@ function getOverlayBounds() {
   return { minLat: minLat - latPad, maxLat: maxLat + latPad, minLng: minLng - lngPad, maxLng: maxLng + lngPad };
 }
 
+function getGoogleMarkerBounds(stations) {
+  const points = [state.user, ...stations];
+  const lats = points.map((point) => point.lat);
+  const lngs = points.map((point) => point.lng);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+  const minLng = Math.min(...lngs);
+  const maxLng = Math.max(...lngs);
+  const latPad = Math.max((maxLat - minLat) * 0.28, 0.01);
+  const lngPad = Math.max((maxLng - minLng) * 0.28, 0.01);
+  return { minLat: minLat - latPad, maxLat: maxLat + latPad, minLng: minLng - lngPad, maxLng: maxLng + lngPad };
+}
+
 function projectPoint(point) {
   const bounds = state.overlayBounds || getOverlayBounds();
   const x = ((point.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 100;
   const y = (1 - ((point.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat))) * 100;
   return { x: clamp(x, 3, 97), y: clamp(y, 3, 97) };
+}
+
+function projectGoogleMarker(point, bounds) {
+  const x = ((point.lng - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 100;
+  const y = (1 - ((point.lat - bounds.minLat) / (bounds.maxLat - bounds.minLat))) * 100;
+  return { x: clamp(x, 8, 92), y: clamp(y, 14, 84) };
 }
 
 function renderNetworkLines() {
@@ -268,6 +306,7 @@ function renderFilters() {
     state.activeFilters.has(type) ? state.activeFilters.delete(type) : state.activeFilters.add(type);
     button.classList.toggle("active");
     renderMap();
+    renderGoogleTransportMarkers();
     renderNearby();
   }));
 }

@@ -38,6 +38,7 @@ http://localhost:8080
 - Auto-refreshing nearby transport list with distance sorting.
 - Coordinate-based transport overlay with projected station markers, route corridor lines, moving vehicle labels, traffic/service badges, filters, and zoom controls.
 - Google Maps live-location panel using browser GPS coordinates, direct Google Maps links, and transit directions to nearby stations.
+- Clickable metro, bus, and taxi marker icons layered over the Google Maps panel for the nearest transport options.
 - Journey planner with source/destination entry, transport mode selection, ETA, distance, fare, and carbon savings.
 - Fare engine with base fares, per-kilometer pricing, minimum fares, unlock fees, waiting charges, peak/night multipliers, and dynamic ride-share pricing.
 - Multiple currencies with AED as the primary currency.
@@ -50,4 +51,4 @@ http://localhost:8080
 
 Transport stations and route corridors are stored as structured latitude/longitude data in `transport-data.json`, and the overlay projects those coordinates instead of using fixed decorative positions. Fare rules, ETAs, taxi assignment, live vehicles, and traffic indicators are still simulated for demonstration purposes. Real RTA production integrations would require official APIs, authentication, rate limits, and compliance review.
 
-The Google Maps panel uses public Google Maps embed and directions URLs so it works without a Google Maps API key. A fully programmable Google Maps JavaScript API map with custom native Google markers requires a valid Google Maps Platform API key.
+The Google Maps panel uses public Google Maps embed and directions URLs so it works without a Google Maps API key. Metro, bus, and taxi icons are app-rendered overlay markers that link into Google Maps directions. A fully programmable Google Maps JavaScript API map with native Google markers requires a valid Google Maps Platform API key.
