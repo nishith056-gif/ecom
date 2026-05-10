@@ -14,10 +14,10 @@
       <a href="#dashboard">Dashboard</a><a href="#map">Map</a><a href="#planner">Planner</a><a href="#fare">Fares</a><a href="#nol">Nol</a><a href="#tourist">Tourist</a>
     </nav>
     <div class="top-actions">
-      <button class="icon-btn" id="voiceBtn" title="Voice search">🎙</button>
+      <button class="icon-btn" id="voiceBtn" title="Voice search">Mic</button>
       <button class="icon-btn danger" id="sosBtn" title="Emergency SOS">SOS</button>
-      <button class="icon-btn" id="themeToggle" title="Switch theme">☾</button>
-      <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+      <button class="icon-btn" id="themeToggle" title="Switch theme">Mode</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu">Menu</button>
     </div>
   </header>
 
@@ -39,7 +39,10 @@
         <span class="pulse"></span>
         <h2>Live Location</h2>
         <p id="permissionText">Location permission is required for nearest transport discovery.</p>
-        <div class="coords"><span id="latText">Lat: --</span><span id="lngText">Lng: --</span></div>
+        <div class="coords"><span id="latText">Lat: --</span><span id="lngText">Lng: --</span><span id="accuracyText">Accuracy: --</span></div>
+        <div class="hero-actions compact-actions">
+          <a class="secondary map-link" id="openGoogleMaps" href="https://www.google.com/maps" target="_blank" rel="noopener">Open in Google Maps</a>
+        </div>
       </article>
       <article class="glass metric"><small>Nearest Option</small><strong id="nearestText">--</strong><span id="nearestEta">Waiting for GPS</span></article>
       <article class="glass metric"><small>Monthly Spend</small><strong id="spendCounter">AED 0</strong><span>From local trip history</span></article>
@@ -49,16 +52,24 @@
 
     <section class="section" id="map">
       <div class="section-head">
-        <div><p class="eyebrow">Interactive simulated map</p><h2>Nearby transport grid</h2></div>
+        <div><p class="eyebrow">GPS and Google Maps</p><h2>Accurate live location map</h2></div>
         <div class="filters" id="filters"></div>
       </div>
       <div class="map-shell glass">
+        <div class="google-map-card">
+          <iframe id="googleMapFrame" title="Google Maps live location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=25.2048,55.2708&z=14&output=embed"></iframe>
+          <div class="google-map-actions">
+            <a class="primary" id="googleDirections" href="https://www.google.com/maps" target="_blank" rel="noopener">Directions</a>
+            <a class="secondary" id="googleSearchNearby" href="https://www.google.com/maps/search/transport+near+me" target="_blank" rel="noopener">Search Nearby</a>
+          </div>
+        </div>
+        <h3 class="map-subtitle">DubaiMove simulated transport overlay</h3>
         <div class="map-toolbar">
           <button id="zoomIn">+</button><button id="zoomOut">-</button><button id="resetMap">Reset</button>
         </div>
         <div class="dubai-map" id="dubaiMap">
           <div class="route-line line-a"></div><div class="route-line line-b"></div>
-          <div class="moving metro-move">🚇</div><div class="moving bus-move">🚌</div>
+          <div class="moving metro-move">Metro</div><div class="moving bus-move">Bus</div>
           <div class="traffic t1">Moderate traffic</div><div class="traffic t2">Clear corridor</div>
         </div>
       </div>
@@ -114,7 +125,7 @@
     </section>
   </main>
 
-  <button class="fab" id="fabLocate" title="Locate me">⌖</button>
+  <button class="fab" id="fabLocate" title="Locate me">GPS</button>
 
   <dialog class="modal" id="detailModal"><div id="modalBody"></div><button class="secondary" data-close>Close</button></dialog>
   <dialog class="modal assistant-modal" id="assistantModal">

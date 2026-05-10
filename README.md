@@ -37,6 +37,7 @@ http://localhost:8080
 - Haversine distance calculation for nearest metro, bus, tram, taxi, water taxi, scooter, and bike options.
 - Auto-refreshing nearby transport list with distance sorting.
 - Simulated interactive map with markers, filters, route lines, moving transport icons, traffic badges, and zoom controls.
+- Google Maps live-location panel using browser GPS coordinates, direct Google Maps links, and transit directions to nearby stations.
 - Journey planner with source/destination entry, transport mode selection, ETA, distance, fare, and carbon savings.
 - Fare engine with base fares, per-kilometer pricing, minimum fares, unlock fees, waiting charges, peak/night multipliers, and dynamic ride-share pricing.
 - Multiple currencies with AED as the primary currency.
@@ -48,3 +49,5 @@ http://localhost:8080
 ## Notes
 
 All transport stations, fare rules, ETAs, taxi assignment, live vehicles, and traffic indicators are simulated with realistic mock Dubai data for demonstration purposes. Real RTA production integrations would require official APIs, authentication, rate limits, and compliance review.
+
+The Google Maps panel uses public Google Maps embed and directions URLs so it works without a Google Maps API key. A fully programmable Google Maps JavaScript API map with custom native Google markers requires a valid Google Maps Platform API key.

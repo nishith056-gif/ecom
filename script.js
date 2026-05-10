@@ -1,6 +1,7 @@
 const state = {
   data: null,
   user: null,
+  watchId: null,
   activeFilters: new Set(["metro", "bus", "tram", "taxi", "bike", "water", "scooter"]),
   selectedModes: new Set(["metro", "bus", "taxi", "rideshare", "bike"]),
   zoom: 1,
@@ -8,8 +9,8 @@ const state = {
   timers: []
 };
 
-const icons = { metro: "🚇", bus: "🚌", tram: "🚋", taxi: "🚕", bike: "🚲", water: "⛴", scooter: "🛴", rideshare: "🚙" };
-const fallbackLocation = { lat: 25.2048, lng: 55.2708, source: "Downtown Dubai demo location" };
+const icons = { metro: "M", bus: "B", tram: "TR", taxi: "TX", bike: "BK", water: "WT", scooter: "SC", rideshare: "RS" };
+const fallbackLocation = { lat: 25.2048, lng: 55.2708, accuracy: null, source: "Downtown Dubai demo location" };
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
@@ -68,25 +69,45 @@ function requestLocation() {
     return;
   }
   $("#permissionText").textContent = "Requesting browser location permission...";
-  navigator.geolocation.getCurrentPosition(
-    (position) => setLocation({ lat: position.coords.latitude, lng: position.coords.longitude, source: "Live GPS" }, true),
+  if (state.watchId !== null) navigator.geolocation.clearWatch(state.watchId);
+  state.watchId = navigator.geolocation.watchPosition(
+    (position) => setLocation({
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+      source: "Live GPS"
+    }, true),
     () => {
       $("#permissionText").textContent = "Location permission denied. Using Downtown Dubai demo GPS.";
       setLocation(fallbackLocation, false);
     },
-    { enableHighAccuracy: true, timeout: 9000, maximumAge: 12000 }
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 5000 }
   );
 }
 
 function setLocation(location, live) {
   state.user = location;
-  $("#permissionText").textContent = live ? "Live GPS connected. Nearby options refresh automatically." : `Using ${location.source}.`;
+  const accuracy = location.accuracy ? ` Accuracy about ${Math.round(location.accuracy)} meters.` : "";
+  $("#permissionText").textContent = live ? `Live GPS connected with Google Maps.${accuracy}` : `Using ${location.source}.`;
   $("#latText").textContent = `Lat: ${location.lat.toFixed(5)}`;
   $("#lngText").textContent = `Lng: ${location.lng.toFixed(5)}`;
+  $("#accuracyText").textContent = `Accuracy: ${location.accuracy ? `${Math.round(location.accuracy)} m` : "demo"}`;
+  updateGoogleMap();
   renderMap();
   renderNearby();
   renderRoutes();
   updateAnalytics();
+}
+
+function updateGoogleMap() {
+  if (!state.user) return;
+  const coords = `${state.user.lat.toFixed(7)},${state.user.lng.toFixed(7)}`;
+  const mapsUrl = `https://www.google.com/maps?q=${coords}`;
+  const nearest = stationsWithDistance()[0];
+  $("#googleMapFrame").src = `https://maps.google.com/maps?q=${coords}&z=16&output=embed`;
+  $("#openGoogleMaps").href = mapsUrl;
+  $("#googleSearchNearby").href = `https://www.google.com/maps/search/transport+near+me/@${coords},15z`;
+  $("#googleDirections").href = nearest ? googleDirectionsUrl(nearest) : mapsUrl;
 }
 
 function haversine(a, b) {
@@ -121,6 +142,7 @@ function renderNearby() {
       <strong>${station.distance.toFixed(2)} km</strong>
       <div class="tag-row">${station.amenities.map((item) => `<span class="tag">${item}</span>`).join("")}</div>
       <button class="secondary full" onclick="showStation('${station.id}')">Details</button>
+      <a class="secondary full map-link" href="${googleDirectionsUrl(station)}" target="_blank" rel="noopener">Google Maps Directions</a>
     </article>
   `).join("");
 }
@@ -149,7 +171,7 @@ function addMarker(item) {
   marker.className = `marker ${item.type === "user" ? "user" : ""}`;
   marker.style.left = `${Math.max(4, Math.min(96, x))}%`;
   marker.style.top = `${Math.max(4, Math.min(96, y))}%`;
-  marker.textContent = item.type === "user" ? "⌖" : icons[item.type];
+  marker.textContent = item.type === "user" ? "GPS" : icons[item.type];
   marker.title = item.name;
   marker.addEventListener("click", () => item.type === "user" ? openModal(`<h2>Your Location</h2><p>${formatCoords()}</p>`) : showStation(item.id));
   $("#dubaiMap").appendChild(marker);
@@ -246,7 +268,7 @@ function renderFareCards() {
 
 function showStation(id) {
   const station = stationsWithDistance().find((item) => item.id === id);
-  openModal(`<h2>${icons[station.type]} ${station.name}</h2><p>${station.area} · ${station.line}</p><p>Status: <strong>${station.status}</strong></p><p>${station.distance.toFixed(2)} km from your current location.</p><div class="tag-row">${station.amenities.map((item) => `<span class="tag">${item}</span>`).join("")}</div>`);
+  openModal(`<h2>${icons[station.type]} ${station.name}</h2><p>${station.area} · ${station.line}</p><p>Status: <strong>${station.status}</strong></p><p>${station.distance.toFixed(2)} km from your current location.</p><p>Coordinates: ${station.lat.toFixed(5)}, ${station.lng.toFixed(5)}</p><div class="tag-row">${station.amenities.map((item) => `<span class="tag">${item}</span>`).join("")}</div><a class="primary map-link" href="${googleDirectionsUrl(station)}" target="_blank" rel="noopener">Open Google Maps Directions</a>`);
 }
 
 function showFare(mode, distance) {
@@ -397,6 +419,10 @@ function setActiveNav() {
 function formatMoney(value) {
   const rate = state.data?.currencyRates[state.currency] || 1;
   return `${state.currency} ${(value * rate).toFixed(2)}`;
+}
+function googleDirectionsUrl(destination) {
+  const origin = state.user ? `${state.user.lat},${state.user.lng}` : `${fallbackLocation.lat},${fallbackLocation.lng}`;
+  return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(`${destination.lat},${destination.lng}`)}&travelmode=transit`;
 }
 function getNumber(key) { return Number(localStorage.getItem(key) || 0); }
 function title(value) { return value.replace(/^\w/, (letter) => letter.toUpperCase()); }
